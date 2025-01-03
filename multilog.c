@@ -511,7 +511,7 @@ void doit(char **script)
 
   flagtimestamp = 0;
   if (script[0])
-    if (script[0][0] == 't' || script[0][0] == 'T')
+    if (script[0][0] == 't' || script[0][0] == 'T' || script[0][0] == 'h')
       flagtimestamp = script[0][0];
 
   for (i = 0;i <= MAXLINE;++i) line[i] = '\n';
@@ -523,9 +523,13 @@ void doit(char **script)
     if (buffer_feed(&ssin) <= 0)
       return;
     if (flagtimestamp) {
-      linelen = (flagtimestamp == 't')
-	? fmt_tai64nstamp(line)
-	: fmt_accustamp(line);
+      if(flagtimestamp == 't'){
+        linelen = fmt_tai64nstamp(line);
+      } else if(flagtimestamp == 'h'){
+        linelen = readable_datetime(line);
+      } else {
+        linelen = fmt_accustamp(line);
+      }
       line[linelen++] = ' ';
     }
     if (buffer_gets(&ssin,line+linelen,MAXLINE-linelen,'\n',&linelen) < 0)
